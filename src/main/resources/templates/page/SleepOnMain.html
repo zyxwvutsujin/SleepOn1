@@ -15,13 +15,20 @@
             const numOfRows = "20";
             const pageNo = "1";
             const sigunguCode = "";
+
             function loadAreaData() {
                 const areaCode = $('#sel').val();
                 console.log(areaCode);
                 $.ajax({
                     url: "/SleepOn/selectArea",
                     type: "post",
-                    data: {areaCode: areaCode, sigunguCode : sigunguCode, arrange : arrange, numOfRows : numOfRows, pageNo : pageNo},
+                    data: {
+                        areaCode: areaCode,
+                        sigunguCode: sigunguCode,
+                        arrange: arrange,
+                        numOfRows: numOfRows,
+                        pageNo: pageNo
+                    },
                     success: function (respData) {
                         const cardContainer = $("#card-container");
                         cardContainer.empty();
@@ -29,16 +36,16 @@
                         if (respData.length > 0) {
                             for (let i = 0; i < respData.length; i++) {
                                 const card = `
-                                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                                    <div class="card" style="height: 100%;">
-                                        <img class="card-img-top thumbnail" src="${respData[i].firstimage2}" alt="thumbnail">
-                                        <div class="card-body">
-                                            <h5 class="card-title">${respData[i].title}</h5>
-                                            <p class="card-text">${respData[i].addr1}</p>
+                                    <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                                        <div class="card" style="height: 100%;">
+                                            <img class="card-img-top thumbnail" src="${respData[i].firstimage2}" alt="thumbnail">
+                                            <div class="card-body">
+                                                <h5 class="card-title">${respData[i].title}</h5>
+                                                <p class="card-text">${respData[i].addr1}</p>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            `;
+                                `;
                                 cardContainer.append(card);
                             }
                         } else {
@@ -58,6 +65,7 @@
             $('#sel').on("change", function () {
                 loadAreaData();
             });
+
             // 지역 선택 시 시군구 데이터 로드
             $('#AreaSel').on("change", function () {
                 const areaCode = $("#AreaSel option:selected").val();
@@ -82,7 +90,7 @@
                     error: function (xhr, status, error) {
                         alert("통신실패 : " + xhr.responseText);
                     }
-                })
+                });
             });
 
             // 검색 버튼 클릭 시 페이지 이동
@@ -104,6 +112,43 @@
                     + "&checkOut=" + encodeURIComponent(checkOut)
                     + "&userCnt=" + encodeURIComponent(userCnt);
             });
+
+            // 페이지 이동
+            $('#seoul-btn').on("click", function () {
+                console.log("서울");
+                const areaCode = "1";
+                window.location.href = "/SleepOn/SearchFestival?areaCode=" + areaCode;
+            });
+            $('#busan-btn').on("click", function () {
+                console.log("부산");
+                const url = `/SleepOn/SearchFestival?areaCode=6`;
+                window.location.href = url;
+            });
+            $('#jeju-btn').on("click", function () {
+                console.log("제주");
+                const url = `/SleepOn/SearchFestival?areaCode=39`;
+                window.location.href = url;
+            });
+
+            // 체크인 날짜가 오늘 이전으로 선택되지 않도록 설정
+            const today = new Date().toISOString().split("T")[0];
+            $('#checkIn').attr('min', today);
+
+            // 체크인 날짜 선택 시 체크아웃 날짜 제약 설정
+            $('#checkIn').on('change', function () {
+                const checkinDate = $(this).val();
+                $('#checkOut').attr('min', checkinDate);
+            });
+
+            // 체크아웃 날짜 선택 시 체크인 날짜가 체크아웃 날짜보다 이후일 수 없도록 설정
+            $('#checkOut').on('change', function () {
+                const checkinDate = $('#checkIn').val();
+                if ($(this).val() <= checkinDate) {
+                    alert("체크아웃 날짜는 체크인 날짜보다 이후여야 합니다.");
+                    $(this).val('');
+                }
+            });
+
         });
     </script>
 </head>
@@ -138,15 +183,15 @@
                 </div>
                 <div class="search-item">
                     <label>체크인</label>
-                    <input type="date" id="checkIn">
+                    <input id="checkIn" type="date">
                 </div>
                 <div class="search-item">
                     <label>체크아웃</label>
-                    <input type="date" id="checkOut">
+                    <input id="checkOut" type="date">
                 </div>
                 <div class="search-item">
                     <label>여행자</label>
-                    <input min="1" value="1" id="userCnt" type="number">
+                    <input id="userCnt" min="1" type="number" value="1">
                 </div>
                 <div class="search-item">
                     <button class="btn btn-search" id="Search-btn">
@@ -163,43 +208,47 @@
             <div class="row">
                 <div class="col-lg-4 col-md-6 mb-4">
                     <div class="card">
-                        <img src="img/seoul.jpg" class="card-img-top" alt="서울">
+                        <img alt="서울" class="card-img-top" src="/img/seoul.jpg">
                         <div class="card-body">
                             <h5 class="card-title">서울</h5>
-                            <p class="card-text">서울에서 최고의 숙소를 찾아보세요.</p>
-                            <a href="/SleepOn/seoul" class="btn btn-primary btn-view">숙소 보기</a>
+                            <p class="card-text">서울에서 함께 즐기기 좋은 행사를 찾아보세요.</p>
+                            <button class="btn btn-primary btn-view" id="seoul-btn" type="button">행사 보기</button>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 mb-4">
                     <div class="card">
-                        <img src="img/busan.jpg" class="card-img-top" alt="부산">
+                        <img alt="부산" class="card-img-top" src="/img/busan.jpg">
                         <div class="card-body">
                             <h5 class="card-title">부산</h5>
-                            <p class="card-text">부산에서 최고의 숙소를 찾아보세요.</p>
-                            <a href="#" class="btn btn-primary btn-view">숙소 보기</a>
+                            <p class="card-text">부산에서 함께 즐기기 좋은 행사를 찾아보세요.</p>
+                            <button class="btn btn-primary btn-view" id="busan-btn" type="button">행사 보기</button>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 mb-4">
                     <div class="card">
-                        <img src="img/jeju.jpg" class="card-img-top" alt="제주">
+                        <img alt="제주" class="card-img-top" src="/img/jeju.jpg">
                         <div class="card-body">
                             <h5 class="card-title">제주</h5>
-                            <p class="card-text">제주에서 최고의 숙소를 찾아보세요.</p>
-                            <a href="#" class="btn btn-primary btn-view">숙소 보기</a>
+                            <p class="card-text">제주에서 함께 즐기기 좋은 행사를 찾아보세요.</p>
+                            <button class="btn btn-primary btn-view" id="jeju-btn" type="button">행사 보기</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
     </section>
     <section>
         <!-- 숙박업소 정보 -->
         <div class="container">
-            <h2 class="text-center my-4">숙박업소 정보</h2>
-            <div class="form-group">
+            <h2 class="text-center my-4">어디로 갈까요?</h2>
+            <div class="input-group mb-3" style="max-width: 600px; margin: auto;">
+                <div class="input-group-prepend">
+            <span class="input-group-text" id="basic-addon1">
+                <img alt="location icon" src="img/location-icon.png" style="width: 20px;">
+            </span>
+                </div>
                 <select class="form-control" id="sel" name="sel">
                     <option selected value="">전국</option>
                     <option value="1">서울</option>
@@ -214,6 +263,12 @@
                     <option value="34">충청남도</option>
                     <option value="33">충청북도</option>
                 </select>
+                <div class="input-group-append">
+                    <button class="btn btn-danger" id="search-btn2" type="button">
+                        <img alt="search icon" src="https://img.icons8.com/ios-glyphs/30/ffffff/search--v1.png"
+                             style="width: 10px;">
+                    </button>
+                </div>
             </div>
             <div class="row" id="card-container">
                 <div class="col-12">

@@ -10,6 +10,7 @@ public class DataBodyDTO {
     private int totalCount; // 전체 결과수
     private DataItemsDTO items;
 
+    @XmlElement
     public int getNumOfRows() {
         return numOfRows;
     }
@@ -18,6 +19,7 @@ public class DataBodyDTO {
         this.numOfRows = numOfRows;
     }
 
+    @XmlElement
     public int getPageNo() {
         return pageNo;
     }
@@ -26,6 +28,7 @@ public class DataBodyDTO {
         this.pageNo = pageNo;
     }
 
+    @XmlElement
     public int getTotalCount() {
         return totalCount;
     }

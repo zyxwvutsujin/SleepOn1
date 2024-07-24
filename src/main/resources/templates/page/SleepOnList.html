@@ -16,6 +16,12 @@
             const numOfRows = "1000";
             let pageNo = "1";
 
+            window.PageMove = function (button){
+                const contentId = $(button).val();
+                console.log(contentId);
+                window.location.href = "/SleepOn/Detail?areaCode=" + encodeURIComponent(areaCode) + "&contentId=" + encodeURIComponent(contentId);
+            }
+
             function loadAreaData() {
                 console.log(areaCode);
                 $.ajax({
@@ -45,6 +51,7 @@
                                         <div class="card-body">
                                             <h5 class="card-title">${respData[i].title}</h5>
                                             <p class="card-text">${respData[i].addr1}</p>
+                                            <button class="btn btn-primary btn-view" type="button" onclick="PageMove(this)" value="${respData[i].contentid}">예약</button>
                                         </div>
                                     </div>
                                 </div>
@@ -122,6 +129,25 @@
             $('#arrangeSel').on("change", function (){
                 arrange = $('#arrangeSel option:selected').val();
                 loadAreaData();
+            });
+
+            // 체크인 날짜가 오늘 이전으로 선택되지 않도록 설정
+            const today = new Date().toISOString().split("T")[0];
+            $('#checkIn').attr('min', today);
+
+            // 체크인 날짜 선택 시 체크아웃 날짜 제약 설정
+            $('#checkIn').on('change', function () {
+                const checkinDate = $(this).val();
+                $('#checkOut').attr('min', checkinDate);
+            });
+
+            // 체크아웃 날짜 선택 시 체크인 날짜가 체크아웃 날짜보다 이후일 수 없도록 설정
+            $('#checkOut').on('change', function () {
+                const checkinDate = $('#checkIn').val();
+                if ($(this).val() <= checkinDate) {
+                    alert("체크아웃 날짜는 체크인 날짜보다 이후여야 합니다.");
+                    $(this).val('');
+                }
             });
         });
     </script>

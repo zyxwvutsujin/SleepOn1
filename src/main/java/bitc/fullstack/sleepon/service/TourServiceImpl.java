@@ -2,8 +2,10 @@ package bitc.fullstack.sleepon.service;
 
 import bitc.fullstack.sleepon.dto.FullDataItemDTO;
 import bitc.fullstack.sleepon.dto.FullDataResponseDTO;
-import bitc.fullstack.sleepon.dto.detail.DataItemDTO;
-import bitc.fullstack.sleepon.dto.detail.DataResponseDTO;
+import bitc.fullstack.sleepon.dto.infor.DataComItemDTO;
+import bitc.fullstack.sleepon.dto.infor.DataComResponseDTO;
+import bitc.fullstack.sleepon.dto.event.FullEventDataItemDTO;
+import bitc.fullstack.sleepon.dto.event.FullEventDataResponseDTO;
 import bitc.fullstack.sleepon.mapper.LocationMapper;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.Unmarshaller;
@@ -13,7 +15,6 @@ import org.springframework.stereotype.Service;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -49,6 +50,34 @@ public class TourServiceImpl implements TourService{
         }
         return itemList;
     }
+    // 지역 행사
+    @Override
+    public List<FullEventDataItemDTO> getEventItemListUrl(String serviceUrl) throws Exception {
+        System.out.println("\n지역행사 : " + serviceUrl);
+        List<FullEventDataItemDTO> itemList = new ArrayList<>();
+        URL url = null;
+        HttpURLConnection urlConn = null;
+
+        try {
+            url = new URL(serviceUrl);
+            urlConn = (HttpURLConnection) url.openConnection();
+            urlConn.setRequestMethod("GET");
+
+            JAXBContext jc = JAXBContext.newInstance(FullEventDataResponseDTO.class);
+            Unmarshaller um = jc.createUnmarshaller();
+
+            FullEventDataResponseDTO fullData = (FullEventDataResponseDTO) um.unmarshal(url);
+            itemList = fullData.getBody().getItems().getItemList();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception("Failed to retrieve data from the service URL: " + serviceUrl, e);
+        } finally {
+            if (urlConn != null) {
+                urlConn.disconnect();
+            }
+        }
+        return itemList;
+    }
 
     @Override
     public Map<String, String> getSigunguMap(String areaCode) {
@@ -65,9 +94,10 @@ public class TourServiceImpl implements TourService{
         return locationMapper.getAreaMap(areaCode);
     }
 
+    // 숙소 공통 정보
     @Override
-    public List<DataItemDTO> getDetailItemList(String serviceUrl) throws Exception {
-        List<DataItemDTO> itemList = new ArrayList<>();
+    public List<DataComItemDTO> getInforItemList(String serviceUrl) throws Exception {
+        List<DataComItemDTO> itemList = new ArrayList<>();
         URL url = null;
         HttpURLConnection urlConn = null;
 
@@ -76,10 +106,10 @@ public class TourServiceImpl implements TourService{
             urlConn = (HttpURLConnection) url.openConnection();
             urlConn.setRequestMethod("GET");
 
-            JAXBContext jc = JAXBContext.newInstance(FullDataResponseDTO.class);
+            JAXBContext jc = JAXBContext.newInstance(DataComResponseDTO.class);
             Unmarshaller um = jc.createUnmarshaller();
 
-            DataResponseDTO fullData = (DataResponseDTO)
+            DataComResponseDTO fullData = (DataComResponseDTO)
                     um.unmarshal(url);
             itemList = fullData.getBody().getItems().getItemList();
         }

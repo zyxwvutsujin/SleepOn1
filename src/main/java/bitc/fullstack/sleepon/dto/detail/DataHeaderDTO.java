@@ -17,6 +17,7 @@ public class DataHeaderDTO {
         this.resultCode = resultCode;
     }
 
+    @XmlElement
     public String getResultMsg() {
         return resultMsg;
     }
