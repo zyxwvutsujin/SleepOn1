@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>SleepOn - 지역 행사 정보</title>
+    <meta lang="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <link href="/css/bootstrap.css" rel="stylesheet">
+    <link href="/css/styles.css" rel="stylesheet">
+    <script src=/js/bootstrap.bundle.js></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            const areaCode = $('#areaCode').val();
+            const areaName = $('#areaName').val();
+            console.log(areaCode);
+            console.log(areaName);
+            function loadFestival() {
+                console.log("시작");
+                $.ajax({
+                    url: "/SleepOn/FestivalArea",
+                    type : "post",
+                    data : {areaCode : areaCode},
+                    success : function (respData) {
+                        const cardContainer = $("#busan-card-container");
+                        cardContainer.empty();
+
+                        if (respData.length > 0) {
+                            for (let i = 0; i < respData.length; i++) {
+                                let imgToUrl = respData[i].firstimage;
+                                if((respData[i].firstimage).toString() === '') {
+                                    imgToUrl = "/img/noimg.jpg";
+                                }
+                                const card = `
+                                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                                    <div class="card" style="height: 100%;">
+                                        <img class="card-img-top" src="${imgToUrl}" alt="">
+                                        <div class="card-body">
+                                            <h5 class="card-title">${respData[i].title}</h5>
+                                            <p class="card-text">${respData[i].addr1}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                                cardContainer.append(card);
+                            }
+                        } else {
+                            cardContainer.append('<div class="col-12"><p>현재 진행 중인 지역 축제가 없습니다.</p></div>');
+                        }
+                    },
+                    error: function () {
+                        alert("통신 중 오류 발생");
+                    }
+                });
+            }
+            loadFestival();
+        });
+    </script>
+</head>
+<body>
+<header th:replace="~{/layout/header :: header-basic}"></header>
+<div class="container">
+    <input type="hidden" th:value="${areaCode}" id="areaCode">
+    <input type="hidden" th:value="${areaName}" id="areaName">
+    <h2 class="text-center my-4"><span th:text="${areaName}"></span>의 행사 정보</h2>
+    <div class="row" id="busan-card-container">
+        <div class="col-12">
+            <p>현재 진행 중인 지역 축제가 없습니다.</p>
+        </div>
+    </div>
+</div>
+<footer th:replace="~{/layout/footer :: footer}"></footer>
+</body>
+</html>

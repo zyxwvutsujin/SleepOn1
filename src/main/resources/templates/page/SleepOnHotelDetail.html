@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>title</title>
+    <meta lang="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <link href="/css/bootstrap.css" rel="stylesheet">
+    <link href="/css/styles.css" rel="stylesheet">
+    <script src=/js/bootstrap.bundle.js></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            const contentId = $('#contentId').val();
+
+            function loadInforData() {
+                $.ajax({
+                    url: "/SleepOn/HotelDetailInfo",
+                    type: "post",
+                    data: {contentId: contentId},
+                    success: function (respData) {
+                        const container = $('#container');
+                        container.empty();
+
+                        if (respData.length > 0) {
+                            for (let i = 0; i < respData.length; i++) {
+                                const tag = `<div>
+                                            <h1>${respData[i].title}</h1>
+                                            <div>
+                                                ${respData[i].overview}
+                                            </div>
+                                        </div>`;
+                                container.append(tag);
+                            }
+                        } else {
+                            container.append('<div class="col-12"><p>조회된 데이터가 없습니다.</p></div>');
+                        }
+                    },
+                    error: function () {
+                        alert("통신 중 오류 발생");
+                    }
+                });
+            }
+            loadInforData();
+        });
+    </script>
+</head>
+<body>
+<header th:replace="~{/layout/header :: header-basic}"></header>
+<main>
+    <input id="areaCode" th:value="${areaCode}" type="hidden">
+    <input id="contentId" th:value="${contentId}" type="hidden">
+    <p th:text="${areaCode}"></p>
+    <p th:text="${contentId}"></p>
+    <section>
+        <div id="container">
+
+        </div>
+    </section>
+</main>
+<footer th:replace="~{/layout/footer :: footer}"></footer>
+</body>
+</html>
