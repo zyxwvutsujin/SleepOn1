@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>SleepOn</title>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <link href="/css/bootstrap.css" rel="stylesheet">
+    <link href="/css/styles.css" rel="stylesheet">
+    <script src="/js/bootstrap.bundle.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            const arrange = "O";
+            const numOfRows = "20";
+            const pageNo = "1";
+            const sigunguCode = "";
+            function loadAreaData() {
+                const areaCode = $('#sel').val();
+                console.log(areaCode);
+                $.ajax({
+                    url: "/SleepOn/selectArea",
+                    type: "post",
+                    data: {areaCode: areaCode, sigunguCode : sigunguCode, arrange : arrange, numOfRows : numOfRows, pageNo : pageNo},
+                    success: function (respData) {
+                        const cardContainer = $("#card-container");
+                        cardContainer.empty();
+
+                        if (respData.length > 0) {
+                            for (let i = 0; i < respData.length; i++) {
+                                const card = `
+                                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                                    <div class="card" style="height: 100%;">
+                                        <img class="card-img-top thumbnail" src="${respData[i].firstimage2}" alt="thumbnail">
+                                        <div class="card-body">
+                                            <h5 class="card-title">${respData[i].title}</h5>
+                                            <p class="card-text">${respData[i].addr1}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                                cardContainer.append(card);
+                            }
+                        } else {
+                            cardContainer.append('<div class="col-12"><p>조회된 데이터가 없습니다.</p></div>');
+                        }
+                    },
+                    error: function () {
+                        alert("통신 중 오류 발생");
+                    }
+                });
+            }
+
+            // 페이지 로드 시 데이터 로드
+            loadAreaData();
+
+            // select 값 변경 시 데이터 로드
+            $('#sel').on("change", function () {
+                loadAreaData();
+            });
+            // 지역 선택 시 시군구 데이터 로드
+            $('#AreaSel').on("change", function () {
+                const areaCode = $("#AreaSel option:selected").val();
+                console.log(areaCode);
+
+                $.ajax({
+                    url: "/SleepOn/SigunguSelect",
+                    type: "post",
+                    data: {areaCode: areaCode},
+                    success: function (data) {
+                        console.log(data);
+                        const SiGunGuSel = $('#SiGunGuSel');
+                        SiGunGuSel.empty();
+                        let html = "<option value='' selected>전국</option>";
+
+                        $.each(data, function (key, value) {
+                            html += "<option value='" + key + "'>" + value + "</option>";
+                        });
+
+                        SiGunGuSel.append(html);
+                    },
+                    error: function (xhr, status, error) {
+                        alert("통신실패 : " + xhr.responseText);
+                    }
+                })
+            });
+
+            // 검색 버튼 클릭 시 페이지 이동
+            $('#Search-btn').on("click", function () {
+                const areaCode = $("#AreaSel option:selected").val();
+                const sigunguCode = $("#SiGunGuSel option:selected").val();
+                const checkIn = $('#checkIn').val();
+                const checkOut = $('#checkOut').val();
+                const userCnt = $('#userCnt').val();
+
+                if (!areaCode || !checkIn || !checkOut || !userCnt) {
+                    return false;
+                }
+
+                // 선택된 값들을 URL 파라미터로 넘겨 페이지 이동
+                window.location.href = "/SleepOn/Search?areaCode=" + encodeURIComponent(areaCode)
+                    + "&sigunguCode=" + encodeURIComponent(sigunguCode)
+                    + "&checkIn=" + encodeURIComponent(checkIn)
+                    + "&checkOut=" + encodeURIComponent(checkOut)
+                    + "&userCnt=" + encodeURIComponent(userCnt);
+            });
+        });
+    </script>
+</head>
+<body>
+<header th:replace="~{layout/header :: header-basic}"></header>
+<main>
+    <!--검색-->
+    <section>
+        <div class="search-bar-container">
+            <div class="search-bar">
+                <div class="search-item">
+                    <label>여행지</label>
+                    <div class="d-flex gap-2">
+                        <select class="form-select" id="AreaSel" name="AreaSel">
+                            <option selected value="">여행지</option>
+                            <option value="1">서울</option>
+                            <option value="6">부산</option>
+                            <option value="39">제주</option>
+                            <option value="31">경기</option>
+                            <option value="2">인천</option>
+                            <option value="32">강원</option>
+                            <option value="36">경상남도</option>
+                            <option value="35">경상북도</option>
+                            <option value="38">전라</option>
+                            <option value="34">충청남도</option>
+                            <option value="33">충청북도</option>
+                        </select>
+                        <select class="form-select" id="SiGunGuSel" name="SiGunGuSel">
+                            <option selected value="">전국</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="search-item">
+                    <label>체크인</label>
+                    <input type="date" id="checkIn">
+                </div>
+                <div class="search-item">
+                    <label>체크아웃</label>
+                    <input type="date" id="checkOut">
+                </div>
+                <div class="search-item">
+                    <label>여행자</label>
+                    <input min="1" value="1" id="userCnt" type="number">
+                </div>
+                <div class="search-item">
+                    <button class="btn btn-search" id="Search-btn">
+                        <img src="https://img.icons8.com/ios-glyphs/30/ffffff/search--v1.png"/>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Popular Destinations -->
+    <section>
+        <div class="container popular-destinations">
+            <h2 class="text-center my-4">인기 여행지</h2>
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card">
+                        <img src="img/seoul.jpg" class="card-img-top" alt="서울">
+                        <div class="card-body">
+                            <h5 class="card-title">서울</h5>
+                            <p class="card-text">서울에서 최고의 숙소를 찾아보세요.</p>
+                            <a href="/SleepOn/seoul" class="btn btn-primary btn-view">숙소 보기</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card">
+                        <img src="img/busan.jpg" class="card-img-top" alt="부산">
+                        <div class="card-body">
+                            <h5 class="card-title">부산</h5>
+                            <p class="card-text">부산에서 최고의 숙소를 찾아보세요.</p>
+                            <a href="#" class="btn btn-primary btn-view">숙소 보기</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card">
+                        <img src="img/jeju.jpg" class="card-img-top" alt="제주">
+                        <div class="card-body">
+                            <h5 class="card-title">제주</h5>
+                            <p class="card-text">제주에서 최고의 숙소를 찾아보세요.</p>
+                            <a href="#" class="btn btn-primary btn-view">숙소 보기</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+    <section>
+        <!-- 숙박업소 정보 -->
+        <div class="container">
+            <h2 class="text-center my-4">숙박업소 정보</h2>
+            <div class="form-group">
+                <select class="form-control" id="sel" name="sel">
+                    <option selected value="">전국</option>
+                    <option value="1">서울</option>
+                    <option value="6">부산</option>
+                    <option value="39">제주</option>
+                    <option value="31">경기</option>
+                    <option value="2">인천</option>
+                    <option value="32">강원</option>
+                    <option value="36">경상남도</option>
+                    <option value="35">경상북도</option>
+                    <option value="38">전라</option>
+                    <option value="34">충청남도</option>
+                    <option value="33">충청북도</option>
+                </select>
+            </div>
+            <div class="row" id="card-container">
+                <div class="col-12">
+                    <p>조회된 데이터가 없습니다.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+<footer th:replace="~{/layout/footer :: footer}"></footer>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>슬립온 - 헤더</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+</head>
+<body>
+<header th:fragment="header-basic">
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <a class="navbar-brand logo" href="/SleepOn" style="color: #ff5a5f; font-size: 2em;">SleepOn</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">로그인</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">회원가입</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Banner -->
+    <div class="container-fluid banner text-center">
+        <div class="row">
+            <div class="col-12 banner-content">
+                <h1>어디에서나, 슬립온과 함께</h1>
+                <p>최고의 숙소를 찾아보세요</p>
+            </div>
+        </div>
+    </div>
+</header>
+</body>
+</html>
