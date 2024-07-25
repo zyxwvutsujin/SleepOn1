@@ -12,14 +12,17 @@ public class SleepOnUserService {
     private SleepOnUserRepository userRepository;
 
     public void registerUser(SleepOnUser user) throws Exception {
-        if (user.isUnderage()) {
-            throw new Exception("2005년 이후 출생자는 가입할 수 없습니다.");
+        if (userRepository.existsById(user.getId())) {
+            throw new Exception("이미 존재하는 사용자입니다.");
         }
-
-        if (user.isManager()) {
-            user.setManager("Y");
-        }
-
         userRepository.save(user);
+    }
+
+    public SleepOnUser authenticate(String id, String pass) {
+        SleepOnUser user = userRepository.findById(id).orElse(null);
+        if (user != null && user.getPass().equals(pass)) {
+            return user;
+        }
+        return null;
     }
 }
