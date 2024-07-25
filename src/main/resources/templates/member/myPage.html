@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>슬립온 - 마이페이지</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .profile-card {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+        }
+
+        .profile-header {
+            background-color: #ff5a5f;
+            color: white;
+            padding: 20px;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .profile-header h3 {
+            margin-bottom: 5px;
+        }
+
+        .profile-header p {
+            margin-bottom: 0;
+        }
+
+        .profile-body {
+            padding: 20px;
+        }
+
+        .membership-status {
+            margin: 20px 0;
+            font-size: 1.2rem;
+        }
+
+        .profile-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+
+        .profile-stats div {
+            text-align: center;
+        }
+
+        .profile-stats span {
+            display: block;
+            color: #888;
+        }
+
+        .profile-stats strong {
+            font-size: 1.5rem;
+            color: #333;
+        }
+
+        .membership-info {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .reservation-item {
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            background-color: #fff;
+        }
+
+        .reviews-section {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .review-item {
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            background-color: #fff;
+            margin-bottom: 15px;
+        }
+
+        .btn-outline-danger {
+            border-color: #ff5a5f;
+            color: #ff5a5f;
+        }
+
+        .btn-outline-danger:hover {
+            background-color: #ff5a5f;
+            color: white;
+        }
+
+
+    </style>
+</head>
+<body>
+<header th:replace="~{/layout/header :: header-basic}"></header>
+
+<div class="container mt-5">
+
+    <div class="profile-card mb-4">
+        <div class="profile-header">
+            <h3>마이페이지</h3>
+        </div>
+        <div class="profile-body">
+            <p class="membership-status">안녕하세요! <span th:text="${user.name}"></span>님</p>
+            <p><span th:text="${user.id}"></span></p>
+            <div class="profile-stats">
+                <div>
+                    <span>등록된 숙소</span>
+                    <strong>24개</strong>
+                </div>
+                <div>
+                    <span>읽은 리뷰</span>
+                    <strong>10개</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="membership-info mb-4">
+        <h5 class="mb-3">예약 내역</h5>
+        <div class="reservation-item p-3 mb-3">
+            <h6>Today's SleepOn 숙박</h6>
+            <p>이용기간: 2024.07.24 체크인 - 2024.07.25 체크아웃</p>
+            <p>결제금액: 49,000원</p>
+            <div class="text-right">
+                <button class="btn btn-outline-danger btn-sm">취소하기</button>
+            </div>
+        </div>
+        <!-- 추가 예약 내역을 여기다 추가 -->
+    </div>
+
+    <div class="reviews-section">
+        <h5 class="mb-3">내가 작성한 리뷰</h5>
+        <div class="review-item p-3 mb-3">
+            <h6>서울 게스트하우스</h6>
+            <p>평점: ★★★★★</p>
+            <p>리뷰 내용: 아주 편안하고 깨끗한 숙소였습니다. 추천합니다!</p>
+            <p>작성일: 2024.07.20</p>
+        </div>
+        <!-- 추가 리뷰 항목을 여기다 추가 -->
+    </div>
+</div>
+
+<footer th:replace="~{/layout/footer :: footer}"></footer>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
