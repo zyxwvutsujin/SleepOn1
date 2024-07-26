@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>title</title>
-    <meta lang="UTF-8">
+    <title>SleepOn - 숙소 상세정보</title>
+    <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <link href="/css/bootstrap.css" rel="stylesheet">
     <link href="/css/styles.css" rel="stylesheet">
-    <script src=/js/bootstrap.bundle.js></script>
+    <script src="/js/bootstrap.bundle.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script>
         $(document).ready(function () {
@@ -24,11 +24,10 @@
                         if (respData.length > 0) {
                             for (let i = 0; i < respData.length; i++) {
                                 const tag = `<div>
-                                            <h1>${respData[i].title}</h1>
+                                            <h1 class="roomTitle">${respData[i].title}</h1>
                                             <div>
                                                 ${respData[i].overview}
-                                            </div>
-                                        </div>`;
+                                            </div>`;
                                 container.append(tag);
                             }
                         } else {
@@ -41,22 +40,66 @@
                 });
             }
             loadInforData();
+
+            // 오늘 날짜를 구하고 체크인, 체크아웃 필드에 설정
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById("checkInDate").setAttribute("min", today);
+            document.getElementById("checkOutDate").setAttribute("min", today);
+
+            // 체크인 날짜 변경 시 체크아웃 최소 날짜 업데이트
+            document.getElementById("checkInDate").addEventListener("change", function () {
+                const checkInDate = this.value;
+                document.getElementById("checkOutDate").setAttribute("min", checkInDate);
+            });
+
+            // 예약 버튼 클릭 시 폼 데이터 업데이트
+            $('#reserveBtn').on('click', function () {
+                const checkIn = document.getElementById("checkInDate").value;
+                const checkOut = document.getElementById("checkOutDate").value;
+                const userCnt = document.getElementById("userCnt").value;
+                const roomTitle = document.querySelector('.roomTitle').innerText; // 이 부분이 roomtitle 값을 가져옵니다.
+                document.getElementById("formCheckIn").value = checkIn;
+                document.getElementById("formCheckOut").value = checkOut;
+                document.getElementById("formUserCnt").value = userCnt;
+                document.getElementById("formRoomTitle").value = roomTitle;
+                document.querySelector("form").submit();
+            });
         });
     </script>
 </head>
 <body>
 <header th:replace="~{/layout/header :: header-basic}"></header>
 <main>
-    <input id="areaCode" th:value="${areaCode}" type="hidden">
     <input id="contentId" th:value="${contentId}" type="hidden">
-    <p th:text="${areaCode}"></p>
-    <p th:text="${contentId}"></p>
+    <p>content id : <span th:text="${contentId}"></span> </p>
+    <p>check in : <span th:text="${checkIn}"></span></p>
+    <p>check out : <span th:text="${checkOut}"></span></p>
+
+    <!-- 날짜 선택 필드 추가 -->
+    <label for="checkInDate">Check-in Date:</label>
+    <input type="date" id="checkInDate" class="form-control" th:value="${checkIn}">
+    <label for="checkOutDate">Check-out Date:</label>
+    <input type="date" id="checkOutDate" class="form-control" th:value="${checkOut}">
+
+    <!-- 인원 수 입력 필드 추가 -->
+    <label for="userCnt">Number of Users:</label>
+    <input type="number" id="userCnt" name="userCnt" class="form-control" min="1" max="10" th:value="${userCnt}">
+
     <section>
         <div id="container">
-
+            <!-- 숙소 상세 정보 -->
         </div>
+        <form action="/SleepOn/reserve" method="post">
+            <input type="hidden" name="contentId" th:value="${contentId}">
+            <input type="hidden" name="checkIn" id="formCheckIn" th:value="${checkIn}">
+            <input type="hidden" name="checkOut" id="formCheckOut" th:value="${checkOut}">
+            <input type="hidden" name="roomtitle" id="formRoomTitle" th:value="${roomtitle}">
+            <input type="hidden" name="userCnt" id="formUserCnt" th:value="${userCnt}">
+            <button type="button" class="btn btn-primary" id="reserveBtn">예약</button>
+        </form>
     </section>
 </main>
 <footer th:replace="~{/layout/footer :: footer}"></footer>
+
 </body>
 </html>

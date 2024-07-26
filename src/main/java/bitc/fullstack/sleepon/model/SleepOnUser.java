@@ -3,10 +3,14 @@ package bitc.fullstack.sleepon.model;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import org.apache.catalina.User;
 
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+
 
 @Entity
 public class SleepOnUser {
@@ -29,6 +33,9 @@ public class SleepOnUser {
 
     @Column(length = 1, nullable = false)
     private String manager = "N";
+
+    @OneToMany(mappedBy = "user")
+    private List<UserReservation> reservations;
 
     // Getters and Setters
 
@@ -78,6 +85,14 @@ public class SleepOnUser {
 
     public void setManager(String manager) {
         this.manager = manager;
+    }
+
+    public List<UserReservation> getReservations() {
+        return reservations;
+    }
+
+    public void setReservations(List<UserReservation> reservations) {
+        this.reservations = reservations;
     }
 
     public boolean isUnderage() {

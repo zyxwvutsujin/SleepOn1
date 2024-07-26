@@ -1,20 +1,45 @@
--- 테이블이 이미 존재하는 경우 삭제
-DROP TABLE IF EXISTS sleep_on_user;
+-- -- -- 테이블이 이미 존재하는 경우 삭제
+-- -- DROP TABLE IF EXISTS sleep_on_user;
+--
+-- -- 테이블 생성
+-- CREATE TABLE sleep_on_user (
+--                                id VARCHAR(45) NOT NULL,
+--                                pass VARCHAR(45) NOT NULL,
+--                                name VARCHAR(45) NOT NULL,
+--                                age VARCHAR(45) NOT NULL,
+--                                tel VARCHAR(45),
+--                                manager CHAR(1) NOT NULL DEFAULT 'N',
+--                                PRIMARY KEY (id)
+-- );
+--
+-- -- 데이터 삽입
+-- INSERT INTO sleep_on_user (id, pass, name, age, tel, manager)
+-- VALUES ('admin@sleepon.com', 'SleepOn1234', 'SleepOn 상담사', '2000-01-01', '010-1234-5678', 'Y');
+--
+-- INSERT INTO sleep_on_user (id, pass, name, age, tel, manager)
+-- VALUES ('user1@gmail.com', 'user1234', 'User One', '2001-05-20', '010-1111-2222', 'N');
+--
+-- -- UserReservation 테이블이 이미 존재하는 경우 삭제
+-- -- DROP TABLE IF EXISTS user_reservation;
+--
+-- -- UserReservation 테이블 생성
+-- CREATE TABLE UserReservation_ (
+--                                   idx INT NOT NULL AUTO_INCREMENT,
+--                                   user_id VARCHAR(45) NOT NULL,
+--                                   reserv_data DATETIME NOT NULL,
+--                                   checkintime VARCHAR(45) NOT NULL,
+--                                   checkouttime VARCHAR(45) NOT NULL,
+--                                   contentId VARCHAR(45) NOT NULL,
+--                                   reserv_cancel CHAR(1) NOT NULL DEFAULT 'N',
+--                                   roomtitle VARCHAR(45) NOT NULL,
+--                                   PRIMARY KEY (idx),
+--                                   FOREIGN KEY (user_id) REFERENCES sleep_on_user(id)
+-- );
+--
 
--- 테이블 생성
-CREATE TABLE sleep_on_user (
-                               id VARCHAR(45) NOT NULL,
-                               pass VARCHAR(45) NOT NULL,
-                               name VARCHAR(45) NOT NULL,
-                               age VARCHAR(45) NOT NULL,
-                               tel VARCHAR(45),
-                               manager CHAR(1) NOT NULL DEFAULT 'N',
-                               PRIMARY KEY (id)
-);
 
--- 데이터 삽입
-INSERT INTO sleep_on_user (id, pass, name, age, tel, manager)
-VALUES ('admin@sleepon.com', 'SleepOn1234', 'SleepOn 상담사', '2000-01-01', '010-1234-5678', 'Y');
+-- Drop the table if it exists
+-- DROP TABLE IF EXISTS userreservation_;
 
-INSERT INTO sleep_on_user (id, pass, name, age, tel, manager)
-VALUES ('user1@gmail.com', 'user1234', 'User One', '2001-05-20', '010-1111-2222', 'N');
+-- Optionally, recreate the foreign key constraint if necessary
+-- ALTER TABLE review ADD CONSTRAINT FKqrbfcxuua4yxvf3diyt03mpok FOREIGN KEY (your_column_name) REFERENCES user_reservation(your_column_name);

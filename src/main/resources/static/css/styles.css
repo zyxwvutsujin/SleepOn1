@@ -1,7 +1,7 @@
 @font-face {
     font-family: 'LINESeedKR-Bd';
     src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_11-01@1.0/LINESeedKR-Bd.woff2') format('woff2');
-    font-weight: 700;
+    font-weight: 400;
     font-style: normal;
 }
 
@@ -10,7 +10,6 @@
     margin: 0;
     font-family: LINESeedKR-Bd;
     box-sizing: border-box;
-
 }
 
 .navbar {
@@ -24,6 +23,11 @@
 .navbar-nav .nav-link {
     color: #333333;
 }
+.navbar-nav {
+    margin-left: auto; /* Add this line */
+    margin-right: 5px;
+}
+
 .banner {
     background: url('../img/banner.jpg') no-repeat center center;
     background-size: cover;
@@ -49,10 +53,24 @@
 .banner h1, .banner p {
     color: white;
 }
+.search-item select{
+    width: 130px;
+}
 .banner .btn-primary {
     background-color: #ff5a5f;
     border: none;
 }
+.btn-primary:hover, .btn-primary:focus {
+    background-color: #f18c8f;
+    border: none;
+    color: white;
+}
+.btn-search:hover, .btn-search:focus {
+    background-color: #f18c8f;
+    border: none;
+    color: white;
+}
+
 .popular-destinations .card, .card-container .card {
     border: none;
     transition: transform 0.2s;
@@ -97,9 +115,6 @@
     display: flex;
     flex-direction: column;
 }
-.search-item select{
-    width: 130px;
-}
 .search-item label {
     font-size: 12px;
     color: #888;
@@ -131,6 +146,7 @@
     font-weight: bold;
     font-size: 600;
     font-style: italic;
+    margin-left: 20px;
 }
 .footer {
     background-color: #f8f9fa;
@@ -145,4 +161,58 @@
 .footer a {
     color: #f18c8f;
     margin: 0 10px;
+}
+
+.btn-danger {
+    background-color: #ff5a5f;
+    border: none;
+    color: white;
+}
+
+.search-item img {
+    width: 30px;
+    height: 30px;
+}
+
+.search-item .input-group-prepend img,
+.search-item .input-group-append img {
+    width: 20px;
+    height: 20px;
+    border-radius: 0; /* 모서리 둥글게 제거 */
+}
+
+/* 드래그 방지*/
+div {
+    -webkit-touch-callout: none;
+    user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -webkit-user-select: none;
+}
+
+/* 마이페이지 */
+.profile-info {
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.profile-title {
+    font-size: 1.5rem;
+    color: #ff5a5f;
+    margin-bottom: 20px;
+}
+
+.profile-item {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    color: #555;
+}
+
+.input-group-text img {
+    border-radius: 0;
+    width: 20px;
+    height: 20px;
 }

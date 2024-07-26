@@ -3,6 +3,8 @@ package bitc.fullstack.sleepon.controller;
 import bitc.fullstack.sleepon.dto.FullDataItemDTO;
 import bitc.fullstack.sleepon.dto.infor.DataComItemDTO;
 import bitc.fullstack.sleepon.dto.event.FullEventDataItemDTO;
+import bitc.fullstack.sleepon.model.SleepOnUser;
+import bitc.fullstack.sleepon.model.UserReservation;
 import bitc.fullstack.sleepon.service.TourService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -10,10 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.time.LocalDateTime;
@@ -34,15 +33,12 @@ public class TourController {
     @Value("${SleepOn.service.Url}")
     private String APIUrl;
 
-    // 숙소 기본 정부 ( 시설 정보, 이용 안내)
     @Value("${SleepOn.service.Infor.Url}")
     private String APIInforUrl;
 
-    // 숙소 세부 정부 (객실, 가격)
     @Value("${SleepOn.service.detail.Url}")
     private String APIDetailUrl;
 
-    // 지역 행사
     @Value("${SleepOnEvent.service.Url}")
     private String eventApiurl;
 
@@ -54,7 +50,6 @@ public class TourController {
         }
         return "page/SleepOnMain";
     }
-
 
     @GetMapping("/login")
     public String SleepOnLogin() throws Exception {
@@ -75,13 +70,11 @@ public class TourController {
         return "redirect:/SleepOn";
     }
 
-
-    // 숙소 정보 보기 ajax 통신
     @ResponseBody
     @RequestMapping("/selectArea")
     public Object SleepOnService(@RequestParam("areaCode") String areaCode, @RequestParam("sigunguCode") String sigunguCode, @RequestParam("arrange") String arrange, @RequestParam("numOfRows") String numOfRows, @RequestParam("pageNo") String pageNo) throws Exception {
         System.out.println("main 페이지에서 선택 : " + areaCode);
-//http://apis.data.go.kr/B551011/KorService1/searchStay1?areaCode=&sigunguCode=&ServiceKey=인증키&listYN=Y&MobileOS=ETC&MobileApp=AppTest&arrange=A&numOfRows=12&pageNo=1
+
         String opt1 = "?areaCode="; // 지역코드
         String opt2 = "&sigunguCode="; // 시군구코드
         String opt3 = "&ServiceKey=";
@@ -95,12 +88,9 @@ public class TourController {
         return itemList;
     }
 
-    // 지역 축제 조회 ajax 통신
     @ResponseBody
     @RequestMapping("/FestivalArea")
     public Object SearchFestival(@RequestParam("areaCode") String areaCode) throws Exception {
-        //https://apis.data.go.kr/B551011/KorService1/searchFestival1?areaCode=1&serviceKey=&numOfRows=200&pageNo=1&MobileOS=ETC&MobileApp=AppTest&listYN=Y&arrange=R&eventStartDate=20240101
-
         String dateFormat = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         System.out.println("\n 날짜 : " + dateFormat);
 
@@ -113,7 +103,6 @@ public class TourController {
         return itemList;
     }
 
-    // 지역 축제
     @RequestMapping("/SearchFestival")
     public String SearchFestival(@RequestParam("areaCode") String areaCode, HttpSession session) throws Exception {
         System.out.println("searchFestival : " + areaCode);
@@ -124,9 +113,9 @@ public class TourController {
         return "redirect:/SleepOn/Festival";
     }
 
-    // 지역 축제 View 페이지
     @RequestMapping("/Festival")
-    public ModelAndView AreaFestival(HttpSession session) throws Exception {
+    public ModelAndView AreaFestival(HttpSession session, HttpServletRequest request, Model model) throws Exception {
+        addSessionAttributesToModel(request, model);
         ModelAndView mv = new ModelAndView("page/SleepOnFestival");
 
         String areaCode = (String) session.getAttribute("areaCode");
@@ -138,7 +127,6 @@ public class TourController {
         return mv;
     }
 
-    // 지역 선택시 시군구
     @ResponseBody
     @RequestMapping("/SigunguSelect")
     public Map<String, String> selectSigungu(@RequestParam("areaCode") String areaCode) throws Exception {
@@ -149,11 +137,9 @@ public class TourController {
         return sigunguMap;
     }
 
-    // 검색 창에 지역, 시군구, 날짜, 인원 선택하면 세션 저장하여 리다이렉트
     @RequestMapping("/Search")
     public String SleepOnSearch(@RequestParam("areaCode") String areaCode, @RequestParam("sigunguCode") String sigunguCode, @RequestParam("checkIn") String checkIn, @RequestParam("checkOut") String checkOut, @RequestParam("userCnt") String userCnt, HttpSession session) throws Exception {
 
-        // 값 저장
         session.setAttribute("areaCode", areaCode);
         session.setAttribute("sigunguCode", sigunguCode);
         session.setAttribute("checkIn", checkIn);
@@ -171,8 +157,8 @@ public class TourController {
 
     @ResponseBody
     @RequestMapping("/SleepOnList")
-    public ModelAndView SleepOnList(HttpSession session) throws Exception {
-        // 세션에서 값 가져오기
+    public ModelAndView SleepOnList(HttpSession session, HttpServletRequest request, Model model) throws Exception {
+        addSessionAttributesToModel(request, model);
         String areaCode = (String) session.getAttribute("areaCode");
         String sigunguCode = (String) session.getAttribute("sigunguCode");
         String checkIn = (String) session.getAttribute("checkIn");
@@ -193,56 +179,96 @@ public class TourController {
         return mv;
     }
 
-    // 숙소 상세정보, contentId, areaCode, sigunguCode 값 받아오기
     @RequestMapping("/Detail")
-    public String SleepOnDetail(@RequestParam("areaCode") String areaCode, @RequestParam("contentId") String contentId, HttpSession session) throws Exception {
-        session.setAttribute("areaCode", areaCode);
+    public String SleepOnDetail(@RequestParam("contentId") String contentId, @RequestParam("userCnt") String userCnt, @RequestParam("checkIn") String checkIn, @RequestParam("checkOut") String checkOut, HttpSession session) throws Exception {
         session.setAttribute("contentId", contentId);
+        session.setAttribute("userCnt", userCnt);
+        session.setAttribute("checkIn", checkIn);
+        session.setAttribute("checkOut", checkOut);
 
         return "redirect:/SleepOn/HotelDetail";
     }
 
     @RequestMapping("/HotelDetail")
-    public ModelAndView SleepOnDetail(HttpSession session) throws Exception {
+    public ModelAndView SleepOnDetail(HttpSession session, HttpServletRequest request, Model model) throws Exception {
+        addSessionAttributesToModel(request, model);
         ModelAndView mv = new ModelAndView("page/SleepOnHotelDetail");
 
-        String areaCode = (String) session.getAttribute("areaCode");
         String contentId = (String) session.getAttribute("contentId");
+        String userCnt = (String) session.getAttribute("userCnt");
+        String checkIn = (String) session.getAttribute("checkIn");
+        String checkOut = (String) session.getAttribute("checkOut");
 
-        mv.addObject("areaCode", areaCode);
         mv.addObject("contentId", contentId);
+        mv.addObject("userCnt", userCnt);
+        mv.addObject("checkIn", checkIn);
+        mv.addObject("checkOut", checkOut);
 
         return mv;
     }
 
-    @ResponseBody
     @RequestMapping("/HotelDetailInfo")
-    public Object SleepOnDetail(@RequestParam("contentId") String contentId) throws Exception {
+    @ResponseBody
+    public List<DataComItemDTO> getHotelDetailInfo(@RequestParam("contentId") String contentId) throws Exception {
+        String opt1 = "?contentId=";
+        String opt2 = "&ServiceKey=";
+        String opt3 = "&MobileOS=ETC&MobileApp=AppTest";
 
-        // 공통 정보
-        //http://apis.data.go.kr/B551011/KorService1/detailCommon1?ServiceKey=인증키&contentTypeId=32&contentId=142785&MobileOS=ETC&MobileApp=AppTest&defaultYN=Y&firstImageYN=Y&areacodeYN=Y&catcodeYN=Y&addrinfoYN=Y&mapinfoYN=Y&overviewYN=Y
-
-        String opt1 = "?ServiceKey=";
-        String opt2 = "&contentTypeId=32";
-        String opt3 = "&contentId=";
-        String opt4 = "&MobileOS=ETC&MobileApp=AppTest&defaultYN=Y&firstImageYN=Y&areacodeYN=Y&catcodeYN=Y&addrinfoYN=Y&mapinfoYN=Y&overviewYN=Y";
-
-        List<DataComItemDTO> itemList = tourService.getInforItemList(APIInforUrl + opt1 + APIkey + opt2 + opt3 + contentId + opt4);
-
-        return itemList;
+        String serviceUrl = APIInforUrl + opt1 + contentId + opt2 + APIkey + opt3;
+        List<DataComItemDTO> infoList = tourService.getInforItemList(serviceUrl);
+        if (infoList == null) {
+            throw new Exception("Failed to retrieve hotel information");
+        }
+        return infoList;
     }
 
-    // 객실 요금
-    //http://apis.data.go.kr/B551011/KorService1/detailInfo1?ServiceKey=인증키&contentTypeId=32&contentId=142785&MobileOS=ETC&MobileApp=AppTest
-
-    // 마이 페이지
     @GetMapping("/myPage")
     public String myPage(HttpServletRequest request, Model model) {
+        addSessionAttributesToModel(request, model);
+        return model.containsAttribute("user") ? "member/myPage" : "redirect:/SleepOn/login";
+    }
+
+    private void addSessionAttributesToModel(HttpServletRequest request, Model model) {
         HttpSession session = request.getSession(false);
         if (session != null && session.getAttribute("user") != null) {
             model.addAttribute("user", session.getAttribute("user"));
-            return "member/myPage";
         }
-        return "redirect:/SleepOn/login"; // 로그인이 안되어 있으면 로그인 페이지로 리다이렉트
+    }
+
+    @RequestMapping(value = "/reserve", method = RequestMethod.POST)
+    public String reserve(
+            @RequestParam("contentId") String contentId,
+            @RequestParam("checkIn") String checkIn,
+            @RequestParam("checkOut") String checkOut,
+            @RequestParam("roomtitle") String roomtitle,
+            @RequestParam("userCnt") int userCnt,
+            HttpSession session) {
+
+        SleepOnUser user = (SleepOnUser) session.getAttribute("user");
+
+        if (user == null) {
+            return "redirect:/SleepOn/login";
+        }
+
+        UserReservation reservation = new UserReservation();
+        reservation.setUser(user);
+        reservation.setReservData(LocalDateTime.now());
+        reservation.setCheckinTime(checkIn);
+        reservation.setCheckoutTime(checkOut);
+        reservation.setContentId(contentId);
+        reservation.setReservCancel('N');
+        reservation.setRoomTitle(roomtitle);
+        reservation.setUserCnt(userCnt);
+
+        tourService.saveReservation(reservation);
+
+        return "redirect:/SleepOn/reservationSuccess";
+    }
+
+
+
+    @RequestMapping("/reservationSuccess")
+    public String reservationSuccess() {
+        return "member/reservationSuccess";
     }
 }

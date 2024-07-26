@@ -26,3 +26,4 @@ public class FullDataResponseDTO {
         this.body = body;
     }
 }
+
